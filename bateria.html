@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Poziom baterii</title>
+</head>
+<body>
+  <h1>Sprawdź poziom baterii</h1>
+  <button onclick="pokazBaterie()">Pokaż poziom baterii</button>
+
+  <script>
+    async function pokazBaterie() {
+      if ('getBattery' in navigator) {
+        try {
+          const battery = await navigator.getBattery();
+          const poziom = (battery.level * 100).toFixed(0); // np. 85
+          const ladowanie = battery.charging ? "Tak" : "Nie";
+
+          alert(`Poziom baterii: ${poziom}%\nŁadowanie: ${ladowanie}`);
+        } catch (err) {
+          alert("Nie udało się odczytać poziomu baterii.");
+        }
+      } else {
+        alert("API baterii nie jest wspierane przez tę przeglądarkę.");
+      }
+    }
+  </script>
+</body>
+</html>
