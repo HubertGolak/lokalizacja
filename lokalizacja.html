@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Lokalizacja przez JavaScript</title>
+</head>
+<body>
+    <h1>Sprawdź swoją lokalizację</h1>
+    <button onclick="getLocation()">Pokaż moją lokalizację</button>
+
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolokalizacja nie jest wspierana przez tę przeglądarkę.");
+            }
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            alert("Twoja lokalizacja:\nSzerokość: " + lat + "\nDługość: " + lon);
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Użytkownik odmówił dostępu do lokalizacji.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Informacja o lokalizacji jest niedostępna.");
+                    break;
+                case error.TIMEOUT:
+                    alert("Przekroczono limit czasu żądania.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("Wystąpił nieznany błąd.");
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
