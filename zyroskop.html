@@ -2,15 +2,30 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Czujniki iPhone</title>
+  <title>Live czujniki telefonu</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #dane { margin-top: 20px; font-size: 18px; }
+    .label { font-weight: bold; }
+  </style>
 </head>
 <body>
-  <h1>Sprawdź położenie telefonu</h1>
-  <button onclick="readSensorsOnce()">Odczytaj czujniki</button>
+  <h1>Live odczyt czujników</h1>
+  <button onclick="startLiveSensors()">Start</button>
+
+  <div id="dane">
+    <p><span class="label">Akcelerometr:</span></p>
+    <p>X: <span id="accX">-</span></p>
+    <p>Y: <span id="accY">-</span></p>
+    <p>Z: <span id="accZ">-</span></p>
+    <p><span class="label">Żyroskop:</span></p>
+    <p>Alpha (Z): <span id="rotAlpha">-</span></p>
+    <p>Beta (X): <span id="rotBeta">-</span></p>
+    <p>Gamma (Y): <span id="rotGamma">-</span></p>
+  </div>
 
   <script>
-    async function readSensorsOnce() {
-      // iOS: uzyskanie zgody na dostęp
+    async function startLiveSensors() {
       if (typeof DeviceMotionEvent.requestPermission === 'function') {
         try {
           const response = await DeviceMotionEvent.requestPermission();
@@ -19,34 +34,23 @@
             return;
           }
         } catch (err) {
-          alert('Błąd przy uzyskiwaniu zgody: ' + err);
+          alert('Błąd: ' + err);
           return;
         }
       }
 
-      // Jednorazowy nasłuch
-      const handler = (event) => {
+      window.addEventListener('devicemotion', (event) => {
         const acc = event.accelerationIncludingGravity || {};
         const rot = event.rotationRate || {};
 
-        const accX = acc.x?.toFixed(2);
-        const accY = acc.y?.toFixed(2);
-        const accZ = acc.z?.toFixed(2);
+        document.getElementById('accX').textContent = acc.x?.toFixed(2) ?? '-';
+        document.getElementById('accY').textContent = acc.y?.toFixed(2) ?? '-';
+        document.getElementById('accZ').textContent = acc.z?.toFixed(2) ?? '-';
 
-        const rotAlpha = rot.alpha?.toFixed(2);
-        const rotBeta = rot.beta?.toFixed(2);
-        const rotGamma = rot.gamma?.toFixed(2);
-
-        alert(
-          `Akcelerometr:\nX: ${accX}\nY: ${accY}\nZ: ${accZ}\n\n` +
-          `Żyroskop:\nAlpha (Z): ${rotAlpha}\nBeta (X): ${rotBeta}\nGamma (Y): ${rotGamma}`
-        );
-
-        window.removeEventListener('devicemotion', handler);
-      };
-
-      // Dodanie nasłuchu
-      window.addEventListener('devicemotion', handler, { once: true });
+        document.getElementById('rotAlpha').textContent = rot.alpha?.toFixed(2) ?? '-';
+        document.getElementById('rotBeta').textContent = rot.beta?.toFixed(2) ?? '-';
+        document.getElementById('rotGamma').textContent = rot.gamma?.toFixed(2) ?? '-';
+      });
     }
   </script>
 </body>
