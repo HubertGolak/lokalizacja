@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Pinch Gesture</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; touch-action: none; }
+    #obszar {
+      width: 100%;
+      height: 80vh;
+      border: 2px dashed #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Przeciągnij dwa palce (pinch)</h1>
+  <div id="obszar">Użyj gestu pinch tutaj</div>
+
+  <script>
+    let startDistance = null;
+
+    function getDistance(touches) {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    const obszar = document.getElementById('obszar');
+
+    obszar.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        startDistance = getDistance(e.touches);
+      }
+    });
+
+    obszar.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2 && startDistance) {
+        const currentDistance = getDistance(e.touches);
+        const delta = currentDistance - startDistance;
+
+        if (Math.abs(delta) > 20) { // próg czułości
+          if (delta > 0) {
+            alert("Pinch OUT (przybliżenie)");
+          } else {
+            alert("Pinch IN (oddalenie)");
+          }
+          startDistance = null; // reset, żeby alert nie spamował
+        }
+      }
+    });
+
+    obszar.addEventListener('touchend', () => {
+      startDistance = null;
+    });
+  </script>
+</body>
+</html>
