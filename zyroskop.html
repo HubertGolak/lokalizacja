@@ -9,13 +9,14 @@
   <button onclick="startSensors()">Pokaż dane</button>
 
   <script>
+    let listenerActive = false;
+
     function startSensors() {
-      // iOS (13+) – wymaga zgody
       if (typeof DeviceMotionEvent.requestPermission === 'function') {
         DeviceMotionEvent.requestPermission()
           .then(response => {
             if (response === 'granted') {
-              enableMotionListener();
+              addMotionListener();
             } else {
               alert('Brak zgody na dostęp do czujników.');
             }
@@ -25,13 +26,14 @@
             alert('Błąd przy uzyskiwaniu zgody.');
           });
       } else {
-        // Android lub starszy iOS
-        enableMotionListener();
+        addMotionListener();
       }
     }
 
-    function enableMotionListener() {
-      window.addEventListener('devicemotion', function(event) {
+    function addMotionListener() {
+      if (listenerActive) return; // zapobiega wielokrotnemu dodawaniu
+
+      const handler = function(event) {
         const acc = event.accelerationIncludingGravity;
         const rot = event.rotationRate;
 
@@ -39,18 +41,21 @@
         const accY = acc?.y?.toFixed(2);
         const accZ = acc?.z?.toFixed(2);
 
-        const rotAlpha = rot?.alpha?.toFixed(2); // obrót wokół osi Z
-        const rotBeta = rot?.beta?.toFixed(2);   // obrót wokół osi X
-        const rotGamma = rot?.gamma?.toFixed(2); // obrót wokół osi Y
+        const rotAlpha = rot?.alpha?.toFixed(2);
+        const rotBeta = rot?.beta?.toFixed(2);
+        const rotGamma = rot?.gamma?.toFixed(2);
 
         alert(
           `Akcelerometr:\nX: ${accX}\nY: ${accY}\nZ: ${accZ}\n\n` +
           `Żyroskop:\nAlpha (Z): ${rotAlpha}\nBeta (X): ${rotBeta}\nGamma (Y): ${rotGamma}`
         );
 
-        // Po pierwszym odczycie przestaje słuchać
-        window.removeEventListener('devicemotion', arguments.callee);
-      });
+        window.removeEventListener('devicemotion', handler);
+        listenerActive = false;
+      };
+
+      window.addEventListener('devicemotion', handler);
+      listenerActive = true;
     }
   </script>
 </body>
